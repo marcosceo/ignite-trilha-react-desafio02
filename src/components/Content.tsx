@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { SelectedGenreIdContext } from '../SelectedGenreIdContext'
+
 import { api } from "../services/api";
+
 import { MovieCard } from './MovieCard'
 
 export function Content() {
@@ -15,8 +17,16 @@ export function Content() {
     Runtime: string;
   }
 
+  interface GenreResponseProps {
+    id: number;
+    name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
+    title: string;
+  }
+
   const { selectedGenreId } = useContext(SelectedGenreIdContext)
 
+  const [selectedGenre, setSelectedGenre] = useState<GenreResponseProps>({} as GenreResponseProps);
+  
   const [movies, setMovies] = useState<MovieProps[]>([]);
 
   useEffect(() => {
@@ -24,12 +34,16 @@ export function Content() {
       setMovies(response.data);
     });
 
+    api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
+      setSelectedGenre(response.data);
+    })
+
   }, [selectedGenreId]);
   
   return (
         <div className="container">
           <header>
-            {/* <span className="category">Categoria:<span> {selectedGenre.title}</span></span> */}
+            <span className="category">Categoria:<span> {selectedGenre.title}</span></span>
           </header>
 
           <main>
